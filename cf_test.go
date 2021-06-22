@@ -1,12 +1,14 @@
 package cf
 
 import (
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"reflect"
 	"testing"
 )
 
 func TestBasic(t *testing.T) {
-	basic := &struct{
+	basic := &struct {
 		StringValue string
 	}{}
 
@@ -20,7 +22,7 @@ func TestBasic(t *testing.T) {
 }
 
 func TestRenaming(t *testing.T) {
-	renamed := &struct{
+	renamed := &struct {
 		SomeInt int `cf:"some_int,-required"`
 	}{}
 
@@ -34,7 +36,7 @@ func TestRenaming(t *testing.T) {
 }
 
 func TestStringArray(t *testing.T) {
-	withArray := &struct{
+	withArray := &struct {
 		StringArray []string
 	}{}
 
@@ -48,7 +50,7 @@ func TestStringArray(t *testing.T) {
 }
 
 func TestRequired(t *testing.T) {
-	required := &struct{
+	required := &struct {
 		Required int `cf:"-required"`
 	}{}
 
@@ -56,4 +58,49 @@ func TestRequired(t *testing.T) {
 
 	err := Load(data, required)
 	assert.NotNil(t, err)
+}
+
+type nestedType struct {
+	Name  string
+	Count int
+}
+
+func newNestedType() *nestedType {
+	return &nestedType{Name: "oh, wow!", Count: 33}
+}
+
+func TestNested(t *testing.T) {
+	root := &struct {
+		Id     string
+		Nested *nestedType
+	}{}
+
+	var data = map[string]interface{}{
+		"Id": "TestNested",
+		"Nested": map[string]interface{}{
+			"Name": "Different",
+		},
+	}
+
+	var localTypeHandlers = map[reflect.Type]TypeHandler{
+		reflect.TypeOf(&nestedType{}): func(v interface{}, f reflect.Value) error {
+			if subMap, ok := v.(map[string]interface{}); ok {
+				n := newNestedType() // defaults
+				err := Load(subMap, n)
+				if err != nil {
+					return err
+				}
+				f.Set(reflect.ValueOf(n))
+				return nil
+			}
+			return errors.Errorf("got [%s], expected [map[string]interface {}]", reflect.TypeOf(v))
+		},
+	}
+
+	err := LoadCustom(data, root, localTypeHandlers)
+	assert.Nil(t, err)
+	assert.Equal(t, "TestNested", root.Id)
+	assert.NotNil(t, root.Nested)
+	assert.Equal(t, "Different", root.Nested.Name)
+	assert.Equal(t, 33, root.Nested.Count)
 }

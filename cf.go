@@ -44,7 +44,9 @@ func load(data map[string]interface{}, cf interface{}, typeHandlers map[reflect.
 						}
 					}
 				} else {
-					return errors.Errorf("no data found for required field '%s'", fd.name)
+					if fd.required {
+						return errors.Errorf("no data found for required field '%s'", fd.name)
+					}
 				}
 			}
 		}
@@ -59,7 +61,7 @@ type fieldData struct {
 }
 
 func parseFieldData(v reflect.StructField) fieldData {
-	fd := fieldData{name: v.Name}
+	fd := fieldData{name: v.Name, skip: false, required: false}
 	data := v.Tag.Get("cf")
 	if data != "" {
 		tokens := strings.Split(data, ",")
