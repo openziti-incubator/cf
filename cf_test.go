@@ -1,7 +1,6 @@
 package cf
 
 import (
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
@@ -69,7 +68,7 @@ func newNestedType() *nestedType {
 	return &nestedType{Name: "oh, wow!", Count: 33}
 }
 
-func TestNested(t *testing.T) {
+func TestNestedPtr(t *testing.T) {
 	root := &struct {
 		Id     string
 		Nested *nestedType
@@ -82,22 +81,32 @@ func TestNested(t *testing.T) {
 		},
 	}
 
-	var localTypeHandlers = map[reflect.Type]TypeHandler{
-		reflect.TypeOf(&nestedType{}): func(v interface{}, f reflect.Value) error {
-			if subMap, ok := v.(map[string]interface{}); ok {
-				n := newNestedType() // defaults
-				err := Load(subMap, n)
-				if err != nil {
-					return err
-				}
-				f.Set(reflect.ValueOf(n))
-				return nil
-			}
-			return errors.Errorf("got [%s], expected [map[string]interface {}]", reflect.TypeOf(v))
+	SetGlobalInstantiator(reflect.TypeOf(nestedType{}), func() interface{} { return newNestedType() })
+
+	err := Load(data, root)
+	assert.Nil(t, err)
+	assert.Equal(t, "TestNested", root.Id)
+	assert.NotNil(t, root.Nested)
+	assert.Equal(t, "Different", root.Nested.Name)
+	assert.Equal(t, 33, root.Nested.Count)
+}
+
+func TestNestedValue(t *testing.T) {
+	root := &struct {
+		Id     string
+		Nested nestedType
+	}{}
+
+	var data = map[string]interface{}{
+		"Id": "TestNested",
+		"Nested": map[string]interface{}{
+			"Name": "Different",
 		},
 	}
 
-	err := LoadCustom(data, root, localTypeHandlers)
+	SetGlobalInstantiator(reflect.TypeOf(nestedType{}), func() interface{} { return newNestedType() })
+
+	err := Load(data, root)
 	assert.Nil(t, err)
 	assert.Equal(t, "TestNested", root.Id)
 	assert.NotNil(t, root.Nested)

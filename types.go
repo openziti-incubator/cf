@@ -5,6 +5,14 @@ import (
 	"reflect"
 )
 
+type Instantiator func() interface{}
+
+var globalInstantiators = make(map[reflect.Type]Instantiator)
+
+func SetGlobalInstantiator(t reflect.Type, i Instantiator) {
+	globalInstantiators[t] = i
+}
+
 type TypeHandler func(v interface{}, f reflect.Value) error
 
 func SetGlobalTypeHandler(t reflect.Type, h TypeHandler) {

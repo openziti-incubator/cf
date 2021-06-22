@@ -36,11 +36,42 @@ func load(data map[string]interface{}, cf interface{}, typeHandlers map[reflect.
 				if v, found := data[fd.name]; found {
 					if cfV.Field(i).CanSet() {
 						if handler, found := typeHandlers[cfV.Type().Field(i).Type]; found {
+							// handler-based
 							if err := handler(v, cfV.Field(i)); err != nil {
 								return errors.Wrapf(err, "field '%s'", fd.name)
 							}
 						} else {
-							return errors.Errorf("no type handler for field '%s' of type [%s]", fd.name, cfV.Field(i).Type())
+							nestedType := cfV.Type().Field(i).Type
+
+							if nestedType.Kind() == reflect.Ptr && nestedType.Elem().Kind() == reflect.Struct {
+								// nested sub-struct pointer
+								nested := instantiatePtr(nestedType)
+								if submap, ok := v.(map[string]interface{}); ok {
+									err := load(submap, nested, typeHandlers)
+									if err != nil {
+										return errors.Wrapf(err, "field '%s'", fd.name)
+									}
+								} else {
+									return errors.Errorf("invalid submap for field '%s'", fd.name)
+								}
+								cfV.Field(i).Set(reflect.ValueOf(nested))
+
+							} else if nestedType.Kind() == reflect.Struct {
+								// nested sub-struct value
+								nested := instantiatePtr(nestedType)
+								if submap, ok := v.(map[string]interface{}); ok {
+									err := load(submap, nested, typeHandlers)
+									if err != nil {
+										return errors.Wrapf(err, "field '%s'", fd.name)
+									}
+								} else {
+									return errors.Errorf("invalid submap for field '%s'", fd.name)
+								}
+								cfV.Field(i).Set(reflect.ValueOf(nested).Elem())
+
+							} else {
+								return errors.Errorf("no type handler for field '%s' of type [%s]", fd.name, cfV.Field(i).Type())
+							}
 						}
 					}
 				} else {
@@ -76,4 +107,16 @@ func parseFieldData(v reflect.StructField) fieldData {
 		}
 	}
 	return fd
+}
+
+func instantiatePtr(t reflect.Type) interface{} {
+	var it = t
+	if it.Kind() == reflect.Ptr {
+		it = it.Elem()
+	}
+	if i, found := globalInstantiators[it]; found {
+		return i()
+	} else {
+		return reflect.New(it).Interface()
+	}
 }
