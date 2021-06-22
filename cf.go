@@ -19,37 +19,12 @@ func Load(data map[string]interface{}, cf interface{}) error {
 			key := keyName(cfV.Type().Field(i))
 			if v, found := data[key]; found {
 				if cfV.Field(i).CanSet() {
-					switch cfV.Field(i).Interface().(type) {
-					case int:
-						if j, ok := v.(int); ok {
-							cfV.Field(i).SetInt(int64(j))
-						} else {
-							return errors.Errorf("field '%s' type mismatch, got [%s], expected [%s]", key, reflect.TypeOf(v), cfV.Field(i).Type())
+					if handler, found := typeHandlers[reflect.TypeOf(cfV.Field(i).Interface())]; found {
+						if err := handler(v, cfV.Field(i)); err != nil {
+							return errors.Wrapf(err, "field '%s'", key)
 						}
-
-					case float64:
-						if f, ok := v.(float64); ok {
-							cfV.Field(i).SetFloat(f)
-						} else {
-							return errors.Errorf("field '%s' type mismatch, got [%s], expected [%s]", key, reflect.TypeOf(v), cfV.Field(i).Type())
-						}
-
-					case bool:
-						if b, ok := v.(bool); ok {
-							cfV.Field(i).SetBool(b)
-						} else {
-							return errors.Errorf("field '%s' type mismatch, got [%s], expected [%s]", key, reflect.TypeOf(v), cfV.Field(i).Type())
-						}
-
-					case string:
-						if s, ok := v.(string); ok {
-							cfV.Field(i).SetString(s)
-						} else {
-							return errors.Errorf("field '%s' type mismatch, got [%s], expected [%s]", key, reflect.TypeOf(v), cfV.Field(i).Type())
-						}
-
-					default:
-						return errors.Errorf("unsupported field type [%s]", cfV.Field(i).Type())
+					} else {
+						return errors.Errorf("no type handler for field '%s' of type [%s]", key, cfV.Field(i).Type())
 					}
 				}
 			}

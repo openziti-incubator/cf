@@ -6,7 +6,7 @@ import (
 )
 
 type Basic struct {
-	StringValue string `cf:"StringValue"`
+	StringValue string `cf`
 }
 
 func main() {
