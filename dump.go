@@ -17,8 +17,8 @@ func Dump(label string, cf interface{}) string {
 	format := fmt.Sprintf("\t%%-%ds %%v\n", maxKeyLength(cfV))
 	for i := 0; i < cfV.NumField(); i++ {
 		if cfV.Field(i).CanInterface() {
-			key := keyName(cfV.Type().Field(i))
-			out += fmt.Sprintf(format, key, cfV.Field(i).Interface())
+			fd := parseFieldData(cfV.Type().Field(i))
+			out += fmt.Sprintf(format, fd.name, cfV.Field(i).Interface())
 		}
 	}
 	out += "}\n"
@@ -28,8 +28,8 @@ func Dump(label string, cf interface{}) string {
 func maxKeyLength(cfV reflect.Value) int {
 	maxKeyLength := 0
 	for i := 0; i < cfV.NumField(); i++ {
-		key := keyName(cfV.Type().Field(i))
-		keyLength := len(key)
+		fd := parseFieldData(cfV.Type().Field(i))
+		keyLength := len(fd.name)
 		if keyLength > maxKeyLength {
 			maxKeyLength = keyLength
 		}
