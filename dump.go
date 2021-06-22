@@ -24,3 +24,15 @@ func Dump(label string, cf interface{}) string {
 	out += "}\n"
 	return out
 }
+
+func maxKeyLength(cfV reflect.Value) int {
+	maxKeyLength := 0
+	for i := 0; i < cfV.NumField(); i++ {
+		key := keyName(cfV.Type().Field(i))
+		keyLength := len(key)
+		if keyLength > maxKeyLength {
+			maxKeyLength = keyLength
+		}
+	}
+	return maxKeyLength
+}

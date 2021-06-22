@@ -11,7 +11,7 @@ func SetTypeHandler(t reflect.Type, h TypeHandler) {
 	typeHandlers[t] = h
 }
 
-var typeHandlers = map[reflect.Type]TypeHandler {
+var typeHandlers = map[reflect.Type]TypeHandler{
 	reflect.TypeOf(0): func(v interface{}, f reflect.Value) error {
 		if vt, ok := v.(int); ok {
 			f.SetInt(int64(vt))
