@@ -40,4 +40,11 @@ var typeHandlers = map[reflect.Type]TypeHandler{
 		}
 		return errors.Errorf("got [%s], expected [%s]", reflect.TypeOf(v), f.Type())
 	},
+	reflect.TypeOf([]string{}): func(v interface{}, f reflect.Value) error {
+		if vt, ok := v.([]string); ok {
+			f.Set(reflect.ValueOf(vt))
+			return nil
+		}
+		return errors.Errorf("got [%s], expected [%s]", reflect.TypeOf(v), f.Type())
+	},
 }
