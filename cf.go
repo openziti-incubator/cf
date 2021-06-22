@@ -35,7 +35,7 @@ func load(data map[string]interface{}, cf interface{}, typeHandlers map[reflect.
 			if !fd.skip {
 				if v, found := data[fd.name]; found {
 					if cfV.Field(i).CanSet() {
-						if handler, found := typeHandlers[reflect.TypeOf(cfV.Field(i).Interface())]; found {
+						if handler, found := typeHandlers[cfV.Type().Field(i).Type]; found {
 							if err := handler(v, cfV.Field(i)); err != nil {
 								return errors.Wrapf(err, "field '%s'", fd.name)
 							}
