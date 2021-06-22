@@ -7,6 +7,21 @@ import (
 )
 
 func Load(data map[string]interface{}, cf interface{}) error {
+	return load(data, cf, globalTypeHandlers)
+}
+
+func LoadCustom(data map[string]interface{}, cf interface{}, typeHandlers map[reflect.Type]TypeHandler) error {
+	localTypeHandlers := make(map[reflect.Type]TypeHandler)
+	for k, v := range globalTypeHandlers {
+		localTypeHandlers[k] = v
+	}
+	for k, v := range typeHandlers {
+		localTypeHandlers[k] = v
+	}
+	return load(data, cf, localTypeHandlers)
+}
+
+func load(data map[string]interface{}, cf interface{}, typeHandlers map[reflect.Type]TypeHandler) error {
 	cfV := reflect.ValueOf(cf)
 	if cfV.Kind() == reflect.Ptr {
 		cfV = cfV.Elem()

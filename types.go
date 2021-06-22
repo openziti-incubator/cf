@@ -7,11 +7,11 @@ import (
 
 type TypeHandler func(v interface{}, f reflect.Value) error
 
-func SetTypeHandler(t reflect.Type, h TypeHandler) {
-	typeHandlers[t] = h
+func SetGlobalTypeHandler(t reflect.Type, h TypeHandler) {
+	globalTypeHandlers[t] = h
 }
 
-var typeHandlers = map[reflect.Type]TypeHandler{
+var globalTypeHandlers = map[reflect.Type]TypeHandler{
 	reflect.TypeOf(0):          intHandler,
 	reflect.TypeOf(float64(0)): float64Handler,
 	reflect.TypeOf(true):       boolHandler,
