@@ -1,3 +1,3 @@
 # cf
 
-An opinionated configuration framework for golang.
+A framework for building typed configuration models from flexible data structures.

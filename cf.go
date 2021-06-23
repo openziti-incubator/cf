@@ -97,9 +97,9 @@ func parseFieldData(v reflect.StructField) fieldData {
 	if data != "" {
 		tokens := strings.Split(data, ",")
 		for _, token := range tokens {
-			if token == "-required" {
+			if token == "+required" {
 				fd.required = true
-			} else if token == "-skip" {
+			} else if token == "+skip" {
 				fd.skip = true
 			} else {
 				fd.name = token

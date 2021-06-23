@@ -22,7 +22,7 @@ func TestBasic(t *testing.T) {
 
 func TestRenaming(t *testing.T) {
 	renamed := &struct {
-		SomeInt int `cf:"some_int,-required"`
+		SomeInt int `cf:"some_int,+required"`
 	}{}
 
 	var data = map[string]interface{}{
@@ -50,7 +50,7 @@ func TestStringArray(t *testing.T) {
 
 func TestRequired(t *testing.T) {
 	required := &struct {
-		Required int `cf:"-required"`
+		Required int `cf:"+required"`
 	}{}
 
 	data := make(map[string]interface{})
