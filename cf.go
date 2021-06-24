@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func Load(cf interface{}, data map[string]interface{}, opt *Options) error {
+func Bind(cf interface{}, data map[string]interface{}, opt *Options) error {
 	cfV := reflect.ValueOf(cf)
 	if cfV.Kind() == reflect.Ptr {
 		cfV = cfV.Elem()
@@ -31,7 +31,7 @@ func Load(cf interface{}, data map[string]interface{}, opt *Options) error {
 							if nestedType.Kind() == reflect.Struct || (nestedType.Kind() == reflect.Ptr && nestedType.Elem().Kind() == reflect.Struct) {
 								nested := instantiateAsPtr(nestedType, opt)
 								if subData, ok := v.(map[string]interface{}); ok {
-									err := Load(nested, subData, opt)
+									err := Bind(nested, subData, opt)
 									if err != nil {
 										return errors.Wrapf(err, "field '%s'", fd.name)
 									}
@@ -56,6 +56,16 @@ func Load(cf interface{}, data map[string]interface{}, opt *Options) error {
 					if fd.required {
 						return errors.Errorf("no data found for required field '%s'", fd.name)
 					}
+				}
+			}
+		}
+	}
+	// execute wirings for type
+	if opt.TypeWirings != nil {
+		if wirings, found := opt.TypeWirings[cfV.Elem().Type()]; found {
+			for _, wiring := range wirings {
+				if err := wiring(cfV.Elem()); err != nil {
+					return errors.Wrapf(err, "error wiring [%s]", cfV.Elem().Type().Name())
 				}
 			}
 		}

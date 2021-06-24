@@ -3,12 +3,13 @@ package cf
 import "reflect"
 
 type Instantiator func() interface{}
-
 type Setter func(v interface{}, f reflect.Value) error
+type Wiring func(cf interface{}) error
 
 type Options struct {
 	Instantiators map[reflect.Type]Instantiator
 	Setters       map[reflect.Type]Setter
+	TypeWirings   map[reflect.Type][]Wiring
 }
 
 func DefaultOptions() *Options {
@@ -37,5 +38,13 @@ func (opt *Options) AddSetter(t reflect.Type, s Setter) *Options {
 		opt.Setters = make(map[reflect.Type]Setter)
 	}
 	opt.Setters[t] = s
+	return opt
+}
+
+func (opt *Options) AddTypeWiring(t reflect.Type, w Wiring) *Options {
+	if opt.TypeWirings == nil {
+		opt.TypeWirings = make(map[reflect.Type][]Wiring)
+	}
+	opt.TypeWirings[t] = append(opt.TypeWirings[t], w)
 	return opt
 }
