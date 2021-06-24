@@ -9,7 +9,7 @@ type Wiring func(cf interface{}) error
 type Options struct {
 	Instantiators map[reflect.Type]Instantiator
 	Setters       map[reflect.Type]Setter
-	TypeWirings   map[reflect.Type][]Wiring
+	Wirings       map[reflect.Type][]Wiring
 }
 
 func DefaultOptions() *Options {
@@ -41,10 +41,10 @@ func (opt *Options) AddSetter(t reflect.Type, s Setter) *Options {
 	return opt
 }
 
-func (opt *Options) AddTypeWiring(t reflect.Type, w Wiring) *Options {
-	if opt.TypeWirings == nil {
-		opt.TypeWirings = make(map[reflect.Type][]Wiring)
+func (opt *Options) AddWiring(t reflect.Type, w Wiring) *Options {
+	if opt.Wirings == nil {
+		opt.Wirings = make(map[reflect.Type][]Wiring)
 	}
-	opt.TypeWirings[t] = append(opt.TypeWirings[t], w)
+	opt.Wirings[t] = append(opt.Wirings[t], w)
 	return opt
 }

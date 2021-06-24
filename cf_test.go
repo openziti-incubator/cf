@@ -129,7 +129,7 @@ func TestNestedWithTypeWiring(t *testing.T) {
 
 	opt := DefaultOptions()
 	opt.AddInstantiator(reflect.TypeOf(nestedType{}), func() interface{} { return newNestedType() })
-	opt.AddTypeWiring(reflect.TypeOf(nestedType{}), func(cf interface{}) error {
+	opt.AddWiring(reflect.TypeOf(nestedType{}), func(cf interface{}) error {
 		if v, ok := cf.(*nestedType); ok {
 			v.Count = v.Count * 2
 		}
