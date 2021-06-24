@@ -81,7 +81,7 @@ func TestNestedPtr(t *testing.T) {
 		},
 	}
 
-	SetGlobalInstantiator(reflect.TypeOf(nestedType{}), func() interface{} { return newNestedType() })
+	SetInstantiator(reflect.TypeOf(nestedType{}), func() interface{} { return newNestedType() })
 
 	err := Load(data, root)
 	assert.Nil(t, err)
@@ -104,7 +104,7 @@ func TestNestedValue(t *testing.T) {
 		},
 	}
 
-	SetGlobalInstantiator(reflect.TypeOf(nestedType{}), func() interface{} { return newNestedType() })
+	SetInstantiator(reflect.TypeOf(nestedType{}), func() interface{} { return newNestedType() })
 
 	err := Load(data, root)
 	assert.Nil(t, err)

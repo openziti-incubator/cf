@@ -9,17 +9,17 @@ type Instantiator func() interface{}
 
 var globalInstantiators = make(map[reflect.Type]Instantiator)
 
-func SetGlobalInstantiator(t reflect.Type, i Instantiator) {
+func SetInstantiator(t reflect.Type, i Instantiator) {
 	globalInstantiators[t] = i
 }
 
-type TypeHandler func(v interface{}, f reflect.Value) error
+type Setter func(v interface{}, f reflect.Value) error
 
-func SetGlobalTypeHandler(t reflect.Type, h TypeHandler) {
-	globalTypeHandlers[t] = h
+func SetSetter(t reflect.Type, h Setter) {
+	globalSetters[t] = h
 }
 
-var globalTypeHandlers = map[reflect.Type]TypeHandler{
+var globalSetters = map[reflect.Type]Setter{
 	reflect.TypeOf(0):          intHandler,
 	reflect.TypeOf(float64(0)): float64Handler,
 	reflect.TypeOf(true):       boolHandler,

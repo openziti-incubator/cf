@@ -7,27 +7,12 @@ import (
 )
 
 func Load(data map[string]interface{}, cf interface{}) error {
-	return load(data, cf, globalTypeHandlers)
-}
-
-func LoadCustom(data map[string]interface{}, cf interface{}, typeHandlers map[reflect.Type]TypeHandler) error {
-	localTypeHandlers := make(map[reflect.Type]TypeHandler)
-	for k, v := range globalTypeHandlers {
-		localTypeHandlers[k] = v
-	}
-	for k, v := range typeHandlers {
-		localTypeHandlers[k] = v
-	}
-	return load(data, cf, localTypeHandlers)
-}
-
-func load(data map[string]interface{}, cf interface{}, typeHandlers map[reflect.Type]TypeHandler) error {
 	cfV := reflect.ValueOf(cf)
 	if cfV.Kind() == reflect.Ptr {
 		cfV = cfV.Elem()
 	}
 	if cfV.Kind() != reflect.Struct {
-		return errors.Errorf("cf type [%s] not struct", cfV.Type())
+		return errors.Errorf("provided type [%s] is not a struct", cfV.Type())
 	}
 	for i := 0; i < cfV.NumField(); i++ {
 		if cfV.Field(i).CanInterface() {
@@ -35,18 +20,18 @@ func load(data map[string]interface{}, cf interface{}, typeHandlers map[reflect.
 			if !fd.skip {
 				if v, found := data[fd.name]; found {
 					if cfV.Field(i).CanSet() {
-						if handler, found := typeHandlers[cfV.Type().Field(i).Type]; found {
-							// handler-based
+						if handler, found := globalSetters[cfV.Type().Field(i).Type]; found {
+							// handler-based type
 							if err := handler(v, cfV.Field(i)); err != nil {
 								return errors.Wrapf(err, "field '%s'", fd.name)
 							}
 						} else {
+							// nested structure
 							nestedType := cfV.Type().Field(i).Type
-
 							if nestedType.Kind() == reflect.Struct || (nestedType.Kind() == reflect.Ptr && nestedType.Elem().Kind() == reflect.Struct) {
-								nested := instantiatePtr(nestedType)
-								if submap, ok := v.(map[string]interface{}); ok {
-									err := load(submap, nested, typeHandlers)
+								nested := instantiateAsPtr(nestedType)
+								if subData, ok := v.(map[string]interface{}); ok {
+									err := Load(subData, nested)
 									if err != nil {
 										return errors.Wrapf(err, "field '%s'", fd.name)
 									}
@@ -55,7 +40,7 @@ func load(data map[string]interface{}, cf interface{}, typeHandlers map[reflect.
 								}
 
 								if nestedType.Kind() == reflect.Ptr {
-									// by reference
+									// by pointer
 									cfV.Field(i).Set(reflect.ValueOf(nested))
 								} else {
 									// by value
@@ -102,7 +87,7 @@ func parseFieldData(v reflect.StructField) fieldData {
 	return fd
 }
 
-func instantiatePtr(t reflect.Type) interface{} {
+func instantiateAsPtr(t reflect.Type) interface{} {
 	var it = t
 	if it.Kind() == reflect.Ptr {
 		it = it.Elem()
