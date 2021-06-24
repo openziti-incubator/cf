@@ -5,28 +5,6 @@ import (
 	"reflect"
 )
 
-type Instantiator func() interface{}
-
-var globalInstantiators = make(map[reflect.Type]Instantiator)
-
-func RegisterInstantiator(t reflect.Type, i Instantiator) {
-	globalInstantiators[t] = i
-}
-
-type Setter func(v interface{}, f reflect.Value) error
-
-func RegisterSetter(t reflect.Type, h Setter) {
-	globalSetters[t] = h
-}
-
-var globalSetters = map[reflect.Type]Setter{
-	reflect.TypeOf(0):          intHandler,
-	reflect.TypeOf(float64(0)): float64Handler,
-	reflect.TypeOf(true):       boolHandler,
-	reflect.TypeOf(""):         stringHandler,
-	reflect.TypeOf([]string{}): stringArrayHandler,
-}
-
 func intHandler(v interface{}, f reflect.Value) error {
 	if vt, ok := v.(int); ok {
 		f.SetInt(int64(vt))

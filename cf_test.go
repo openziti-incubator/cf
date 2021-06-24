@@ -15,7 +15,7 @@ func TestBasic(t *testing.T) {
 		"StringValue": "oh, wow!",
 	}
 
-	err := Load(data, basic)
+	err := Load(basic, data, DefaultOptions())
 	assert.Nil(t, err)
 	assert.Equal(t, "oh, wow!", basic.StringValue)
 }
@@ -29,7 +29,7 @@ func TestRenaming(t *testing.T) {
 		"some_int": 46,
 	}
 
-	err := Load(data, renamed)
+	err := Load(renamed, data, DefaultOptions())
 	assert.Nil(t, err)
 	assert.Equal(t, 46, renamed.SomeInt)
 }
@@ -43,7 +43,7 @@ func TestStringArray(t *testing.T) {
 		"StringArray": []string{"one", "two", "three"},
 	}
 
-	err := Load(data, withArray)
+	err := Load(withArray, data, DefaultOptions())
 	assert.Nil(t, err)
 	assert.EqualValues(t, []string{"one", "two", "three"}, withArray.StringArray)
 }
@@ -55,7 +55,7 @@ func TestRequired(t *testing.T) {
 
 	data := make(map[string]interface{})
 
-	err := Load(data, required)
+	err := Load(required, data, DefaultOptions())
 	assert.NotNil(t, err)
 }
 
@@ -81,9 +81,9 @@ func TestNestedPtr(t *testing.T) {
 		},
 	}
 
-	RegisterInstantiator(reflect.TypeOf(nestedType{}), func() interface{} { return newNestedType() })
+	opt := DefaultOptions().AddInstantiator(reflect.TypeOf(nestedType{}), func() interface{} { return newNestedType() })
 
-	err := Load(data, root)
+	err := Load(root, data, opt)
 	assert.Nil(t, err)
 	assert.Equal(t, "TestNested", root.Id)
 	assert.NotNil(t, root.Nested)
@@ -104,9 +104,9 @@ func TestNestedValue(t *testing.T) {
 		},
 	}
 
-	RegisterInstantiator(reflect.TypeOf(nestedType{}), func() interface{} { return newNestedType() })
+	opt := DefaultOptions().AddInstantiator(reflect.TypeOf(nestedType{}), func() interface{} { return newNestedType() })
 
-	err := Load(data, root)
+	err := Load(root, data, opt)
 	assert.Nil(t, err)
 	assert.Equal(t, "TestNested", root.Id)
 	assert.NotNil(t, root.Nested)

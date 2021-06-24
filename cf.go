@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func Load(data map[string]interface{}, cf interface{}) error {
+func Load(cf interface{}, data map[string]interface{}, opt *Options) error {
 	cfV := reflect.ValueOf(cf)
 	if cfV.Kind() == reflect.Ptr {
 		cfV = cfV.Elem()
@@ -20,7 +20,7 @@ func Load(data map[string]interface{}, cf interface{}) error {
 			if !fd.skip {
 				if v, found := data[fd.name]; found {
 					if cfV.Field(i).CanSet() {
-						if handler, found := globalSetters[cfV.Type().Field(i).Type]; found {
+						if handler, found := opt.Setters[cfV.Type().Field(i).Type]; found {
 							// handler-based type
 							if err := handler(v, cfV.Field(i)); err != nil {
 								return errors.Wrapf(err, "field '%s'", fd.name)
@@ -29,9 +29,9 @@ func Load(data map[string]interface{}, cf interface{}) error {
 							// nested structure
 							nestedType := cfV.Type().Field(i).Type
 							if nestedType.Kind() == reflect.Struct || (nestedType.Kind() == reflect.Ptr && nestedType.Elem().Kind() == reflect.Struct) {
-								nested := instantiateAsPtr(nestedType)
+								nested := instantiateAsPtr(nestedType, opt)
 								if subData, ok := v.(map[string]interface{}); ok {
-									err := Load(subData, nested)
+									err := Load(nested, subData, opt)
 									if err != nil {
 										return errors.Wrapf(err, "field '%s'", fd.name)
 									}
@@ -87,12 +87,12 @@ func parseFieldData(v reflect.StructField) fieldData {
 	return fd
 }
 
-func instantiateAsPtr(t reflect.Type) interface{} {
+func instantiateAsPtr(t reflect.Type, opt *Options) interface{} {
 	var it = t
 	if it.Kind() == reflect.Ptr {
 		it = it.Elem()
 	}
-	if i, found := globalInstantiators[it]; found {
+	if i, found := opt.Instantiators[it]; found {
 		return i()
 	} else {
 		return reflect.New(it).Interface()
