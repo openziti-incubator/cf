@@ -43,8 +43,7 @@ func load(data map[string]interface{}, cf interface{}, typeHandlers map[reflect.
 						} else {
 							nestedType := cfV.Type().Field(i).Type
 
-							if nestedType.Kind() == reflect.Ptr && nestedType.Elem().Kind() == reflect.Struct {
-								// nested sub-struct pointer
+							if nestedType.Kind() == reflect.Struct || (nestedType.Kind() == reflect.Ptr && nestedType.Elem().Kind() == reflect.Struct) {
 								nested := instantiatePtr(nestedType)
 								if submap, ok := v.(map[string]interface{}); ok {
 									err := load(submap, nested, typeHandlers)
@@ -54,20 +53,14 @@ func load(data map[string]interface{}, cf interface{}, typeHandlers map[reflect.
 								} else {
 									return errors.Errorf("invalid submap for field '%s'", fd.name)
 								}
-								cfV.Field(i).Set(reflect.ValueOf(nested))
 
-							} else if nestedType.Kind() == reflect.Struct {
-								// nested sub-struct value
-								nested := instantiatePtr(nestedType)
-								if submap, ok := v.(map[string]interface{}); ok {
-									err := load(submap, nested, typeHandlers)
-									if err != nil {
-										return errors.Wrapf(err, "field '%s'", fd.name)
-									}
+								if nestedType.Kind() == reflect.Ptr {
+									// by reference
+									cfV.Field(i).Set(reflect.ValueOf(nested))
 								} else {
-									return errors.Errorf("invalid submap for field '%s'", fd.name)
+									// by value
+									cfV.Field(i).Set(reflect.ValueOf(nested).Elem())
 								}
-								cfV.Field(i).Set(reflect.ValueOf(nested).Elem())
 
 							} else {
 								return errors.Errorf("no type handler for field '%s' of type [%s]", fd.name, cfV.Field(i).Type())
