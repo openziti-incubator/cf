@@ -62,9 +62,9 @@ func Bind(cf interface{}, data map[string]interface{}, opt *Options) error {
 	}
 	// execute wirings for type
 	if opt.TypeWirings != nil {
-		if wirings, found := opt.TypeWirings[cfV.Elem().Type()]; found {
+		if wirings, found := opt.TypeWirings[valueFromPtr(reflect.TypeOf(cf))]; found {
 			for _, wiring := range wirings {
-				if err := wiring(cfV.Elem()); err != nil {
+				if err := wiring(cf); err != nil {
 					return errors.Wrapf(err, "error wiring [%s]", cfV.Elem().Type().Name())
 				}
 			}
@@ -95,6 +95,13 @@ func parseFieldData(v reflect.StructField) fieldData {
 		}
 	}
 	return fd
+}
+
+func valueFromPtr(t reflect.Type) reflect.Type {
+	if t.Kind() == reflect.Ptr {
+		return t.Elem()
+	}
+	return t
 }
 
 func instantiateAsPtr(t reflect.Type, opt *Options) interface{} {
