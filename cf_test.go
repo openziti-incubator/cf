@@ -65,7 +65,7 @@ type nestedType struct {
 }
 
 func newNestedType() *nestedType {
-	return &nestedType{Name: "oh, wow!", Count: 33}
+	return &nestedType{Name: "oh, wow!", Count: 33} // defaults
 }
 
 func TestNestedPtr(t *testing.T) {
@@ -81,7 +81,7 @@ func TestNestedPtr(t *testing.T) {
 		},
 	}
 
-	SetInstantiator(reflect.TypeOf(nestedType{}), func() interface{} { return newNestedType() })
+	RegisterInstantiator(reflect.TypeOf(nestedType{}), func() interface{} { return newNestedType() })
 
 	err := Load(data, root)
 	assert.Nil(t, err)
@@ -104,7 +104,7 @@ func TestNestedValue(t *testing.T) {
 		},
 	}
 
-	SetInstantiator(reflect.TypeOf(nestedType{}), func() interface{} { return newNestedType() })
+	RegisterInstantiator(reflect.TypeOf(nestedType{}), func() interface{} { return newNestedType() })
 
 	err := Load(data, root)
 	assert.Nil(t, err)
