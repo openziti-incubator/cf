@@ -12,7 +12,7 @@ func TestBasic(t *testing.T) {
 	}{}
 
 	var data = map[string]interface{}{
-		"StringValue": "oh, wow!",
+		"string_value": "oh, wow!",
 	}
 
 	err := Bind(basic, data, DefaultOptions())
@@ -22,11 +22,11 @@ func TestBasic(t *testing.T) {
 
 func TestRenaming(t *testing.T) {
 	renamed := &struct {
-		SomeInt int `cf:"some_int,+required"`
+		SomeInt int `cf:"some_int_,+required"`
 	}{}
 
 	var data = map[string]interface{}{
-		"some_int": 46,
+		"some_int_": 46,
 	}
 
 	err := Bind(renamed, data, DefaultOptions())
@@ -40,7 +40,7 @@ func TestStringArray(t *testing.T) {
 	}{}
 
 	var data = map[string]interface{}{
-		"StringArray": []string{"one", "two", "three"},
+		"string_array": []string{"one", "two", "three"},
 	}
 
 	err := Bind(withArray, data, DefaultOptions())
@@ -75,9 +75,9 @@ func TestNestedPtr(t *testing.T) {
 	}{}
 
 	var data = map[string]interface{}{
-		"Id": "TestNested",
-		"Nested": map[string]interface{}{
-			"Name": "Different",
+		"id": "TestNested",
+		"nested": map[string]interface{}{
+			"name": "Different",
 		},
 	}
 
@@ -98,9 +98,9 @@ func TestNestedValue(t *testing.T) {
 	}{}
 
 	var data = map[string]interface{}{
-		"Id": "TestNested",
-		"Nested": map[string]interface{}{
-			"Name": "Different",
+		"id": "TestNested",
+		"nested": map[string]interface{}{
+			"name": "Different",
 		},
 	}
 
@@ -121,9 +121,9 @@ func TestNestedWithTypeWiring(t *testing.T) {
 	}{}
 
 	var data = map[string]interface{}{
-		"Id": "TestNested",
-		"Nested": map[string]interface{}{
-			"Name": "Different",
+		"id": "TestNested",
+		"nested": map[string]interface{}{
+			"name": "Different",
 		},
 	}
 

@@ -23,7 +23,7 @@ func DefaultOptions() *Options {
 			reflect.TypeOf(""):         stringHandler,
 			reflect.TypeOf([]string{}): stringArrayHandler,
 		},
-		NameConverter: PassthroughNameConverter,
+		NameConverter: SnakeCaseNameConverter,
 	}
 	return opt
 }
