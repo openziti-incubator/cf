@@ -5,11 +5,13 @@ import "reflect"
 type Instantiator func() interface{}
 type Setter func(v interface{}, f reflect.Value) error
 type Wiring func(cf interface{}) error
+type NameConverter func(f reflect.StructField) string
 
 type Options struct {
 	Instantiators map[reflect.Type]Instantiator
 	Setters       map[reflect.Type]Setter
 	Wirings       map[reflect.Type][]Wiring
+	NameConverter NameConverter
 }
 
 func DefaultOptions() *Options {
@@ -21,6 +23,7 @@ func DefaultOptions() *Options {
 			reflect.TypeOf(""):         stringHandler,
 			reflect.TypeOf([]string{}): stringArrayHandler,
 		},
+		NameConverter: NilNameConverter,
 	}
 	return opt
 }
@@ -46,5 +49,10 @@ func (opt *Options) AddWiring(t reflect.Type, w Wiring) *Options {
 		opt.Wirings = make(map[reflect.Type][]Wiring)
 	}
 	opt.Wirings[t] = append(opt.Wirings[t], w)
+	return opt
+}
+
+func (opt *Options) SetNameConverter(nc NameConverter) *Options {
+	opt.NameConverter = nc
 	return opt
 }

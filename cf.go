@@ -16,7 +16,7 @@ func Bind(cf interface{}, data map[string]interface{}, opt *Options) error {
 	}
 	for i := 0; i < cfV.NumField(); i++ {
 		if cfV.Field(i).CanInterface() {
-			fd := parseFieldData(cfV.Type().Field(i))
+			fd := parseFieldData(cfV.Type().Field(i), opt)
 			if !fd.skip {
 				if v, found := data[fd.name]; found {
 					if cfV.Field(i).CanSet() {
@@ -79,8 +79,8 @@ type fieldData struct {
 	required bool
 }
 
-func parseFieldData(v reflect.StructField) fieldData {
-	fd := fieldData{name: v.Name, skip: false, required: false}
+func parseFieldData(v reflect.StructField, opt *Options) fieldData {
+	fd := fieldData{name: opt.NameConverter(v), skip: false, required: false}
 	data := v.Tag.Get("cf")
 	if data != "" {
 		tokens := strings.Split(data, ",")
