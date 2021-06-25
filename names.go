@@ -5,7 +5,7 @@ import (
 	"reflect"
 )
 
-func NilNameConverter(f reflect.StructField) string {
+func PassthroughNameConverter(f reflect.StructField) string {
 	return f.Name
 }
 
