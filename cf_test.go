@@ -164,3 +164,21 @@ func TestNestedWithDefaultInstantiator(t *testing.T) {
 	assert.Equal(t, "Different", root.Nested.Name)
 	assert.Equal(t, 0, root.Nested.Count) // type wiring
 }
+
+func TestStructTypeArray(t *testing.T) {
+	root := &struct {
+		Id      string
+		Nesteds []*nestedType
+	}{}
+
+	var data = map[string]interface{}{
+		"id": "StructTypeArray",
+		"nesteds": []map[string]interface{}{
+			{ "name": "a" },
+			{ "name": "b" },
+		},
+	}
+
+	err := Bind(root, data, DefaultOptions())
+	assert.Nil(t, err)
+}
