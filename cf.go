@@ -2,9 +2,23 @@ package cf
 
 import (
 	"github.com/pkg/errors"
+	"gopkg.in/yaml.v3"
+	"io/ioutil"
 	"reflect"
 	"strings"
 )
+
+func BindYaml(cf interface{}, path string, opt *Options) error {
+	data, err := ioutil.ReadFile(path)
+	if err != nil {
+		return errors.Wrapf(err, "error reading yaml [%s]", path)
+	}
+	dataMap := make(map[string]interface{})
+	if err := yaml.Unmarshal(data, dataMap); err != nil {
+		return errors.Wrapf(err, "error parsing yaml [%s]", path)
+	}
+	return Bind(cf, dataMap, opt)
+}
 
 func Bind(cf interface{}, data map[string]interface{}, opt *Options) error {
 	cfV := reflect.ValueOf(cf)
