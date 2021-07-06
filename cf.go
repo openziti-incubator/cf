@@ -34,37 +34,38 @@ func Bind(cf interface{}, data map[string]interface{}, opt *Options) error {
 			if !fd.skip {
 				if v, found := data[fd.name]; found {
 					if cfV.Field(i).CanSet() {
-						if handler, found := opt.Setters[cfV.Type().Field(i).Type]; found {
+						nestedType := cfV.Type().Field(i).Type
+
+						if handler, found := opt.Setters[nestedType]; found {
 							// handler-based type
 							if err := handler(v, cfV.Field(i)); err != nil {
 								return errors.Wrapf(err, "field '%s'", fd.name)
 							}
-						} else {
+						} else if nestedType.Kind() == reflect.Struct || (nestedType.Kind() == reflect.Ptr && nestedType.Elem().Kind() == reflect.Struct) {
 							// nested structure
-							nestedType := cfV.Type().Field(i).Type
-							if nestedType.Kind() == reflect.Struct || (nestedType.Kind() == reflect.Ptr && nestedType.Elem().Kind() == reflect.Struct) {
-								nested := instantiateAsPtr(nestedType, opt)
-								if subData, ok := v.(map[string]interface{}); ok {
-									err := Bind(nested, subData, opt)
-									if err != nil {
-										return errors.Wrapf(err, "field '%s'", fd.name)
-									}
-								} else {
-									return errors.Errorf("invalid submap for field '%s'", fd.name)
+							nested := instantiateAsPtr(nestedType, opt)
+							if subData, ok := v.(map[string]interface{}); ok {
+								err := Bind(nested, subData, opt)
+								if err != nil {
+									return errors.Wrapf(err, "field '%s'", fd.name)
 								}
-
-								if nestedType.Kind() == reflect.Ptr {
-									// by pointer
-									cfV.Field(i).Set(reflect.ValueOf(nested))
-								} else {
-									// by value
-									cfV.Field(i).Set(reflect.ValueOf(nested).Elem())
-								}
-
 							} else {
-								return errors.Errorf("no type handler for field '%s' of type [%s]", fd.name, cfV.Field(i).Type())
+								return errors.Errorf("invalid submap for field '%s'", fd.name)
 							}
+
+							if nestedType.Kind() == reflect.Ptr {
+								// by pointer
+								cfV.Field(i).Set(reflect.ValueOf(nested))
+							} else {
+								// by value
+								cfV.Field(i).Set(reflect.ValueOf(nested).Elem())
+							}
+
+						} else {
+							return errors.Errorf("no type handler for field '%s' of type [%s]", fd.name, nestedType)
 						}
+					} else {
+						return errors.Errorf("non-settable field '%s' of type [%s]", fd.name, cfV.Field(i).Type())
 					}
 				} else {
 					if fd.required {
