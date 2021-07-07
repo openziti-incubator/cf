@@ -63,8 +63,8 @@ func Bind(cf interface{}, data map[string]interface{}, opt *Options) error {
 
 						} else if nestedType.Kind() == reflect.Slice {
 							sliceType := valueFromPtr(nestedType.Elem())
-							if reflect.ValueOf(v).Kind() == reflect.Slice {
-								for j := 0; j < reflect.ValueOf(v).Len(); j++ {
+							if reflect.ValueOf(v).Kind() == reflect.Slice {										// the data should also be a slice
+								for j := 0; j < reflect.ValueOf(v).Len(); j++ {									// iterate over the available data
 									elem := instantiateAsPtr(sliceType, opt)
 									sliceV := reflect.ValueOf(v).Index(j).Interface()
 									if handler, found := opt.Setters[sliceType]; found {
