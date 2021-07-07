@@ -48,6 +48,19 @@ func TestStringArray(t *testing.T) {
 	assert.EqualValues(t, []string{"one", "two", "three"}, withArray.StringArray)
 }
 
+func TestIntArray(t *testing.T) {
+	withArray := &struct {
+		IntArray []int
+	}{}
+
+	var data = map[string]interface{}{
+		"int_array": []int{1, 2, 3, 4, 5, 6},
+	}
+
+	err := Bind(withArray, data, DefaultOptions())
+	assert.Nil(t, err)
+}
+
 func TestRequired(t *testing.T) {
 	required := &struct {
 		Required int `cf:"+required"`
