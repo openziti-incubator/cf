@@ -5,7 +5,7 @@ import (
 	"reflect"
 )
 
-func intHandler(v interface{}, f reflect.Value) error {
+func intSetter(v interface{}, f reflect.Value) error {
 	if vt, ok := v.(int); ok {
 		if f.Kind() == reflect.Ptr {
 			f.Elem().SetInt(int64(vt))
@@ -17,7 +17,7 @@ func intHandler(v interface{}, f reflect.Value) error {
 	return errors.Errorf("got [%s], expected [%s]", reflect.TypeOf(v), f.Type())
 }
 
-func float64Handler(v interface{}, f reflect.Value) error {
+func float64Setter(v interface{}, f reflect.Value) error {
 	if vt, ok := v.(float64); ok {
 		if f.Kind() == reflect.Ptr {
 			f.Elem().SetFloat(vt)
@@ -29,7 +29,7 @@ func float64Handler(v interface{}, f reflect.Value) error {
 	return errors.Errorf("got [%s], expected [%s]", reflect.TypeOf(v), f.Type())
 }
 
-func boolHandler(v interface{}, f reflect.Value) error {
+func boolSetter(v interface{}, f reflect.Value) error {
 	if vt, ok := v.(bool); ok {
 		if f.Kind() == reflect.Ptr {
 			f.Elem().SetBool(vt)
@@ -41,7 +41,7 @@ func boolHandler(v interface{}, f reflect.Value) error {
 	return errors.Errorf("got [%s], expected [%s]", reflect.TypeOf(v), f.Type())
 }
 
-func stringHandler(v interface{}, f reflect.Value) error {
+func stringSetter(v interface{}, f reflect.Value) error {
 	if vt, ok := v.(string); ok {
 		if f.Kind() == reflect.Ptr {
 			f.Elem().SetString(vt)

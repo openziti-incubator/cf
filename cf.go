@@ -1,6 +1,7 @@
 package cf
 
 import (
+	"fmt"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
@@ -93,10 +94,11 @@ func Bind(cf interface{}, data map[string]interface{}, opt *Options) error {
 							}
 
 						} else {
-							return errors.Errorf("no type handler for field '%s' of type [%s/%v]", fd.name, nestedType, nestedType.Kind())
+							fmt.Println(opt.Setters)
+							return errors.Errorf("no setter for field '%s' of type '%s/%v'", fd.name, nestedType, nestedType.Kind())
 						}
 					} else {
-						return errors.Errorf("non-settable field '%s' of type [%s]", fd.name, cfV.Field(i).Type())
+						return errors.Errorf("non-settable field '%s' of type '%s'", fd.name, cfV.Field(i).Type())
 					}
 				} else {
 					if fd.required {

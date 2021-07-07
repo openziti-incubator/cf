@@ -17,10 +17,10 @@ type Options struct {
 func DefaultOptions() *Options {
 	opt := &Options{
 		Setters: map[reflect.Type]Setter{
-			reflect.TypeOf(0):          intHandler,
-			reflect.TypeOf(float64(0)): float64Handler,
-			reflect.TypeOf(true):       boolHandler,
-			reflect.TypeOf(""):         stringHandler,
+			reflect.TypeOf(0):          intSetter,
+			reflect.TypeOf(float64(0)): float64Setter,
+			reflect.TypeOf(true):       boolSetter,
+			reflect.TypeOf(""):         stringSetter,
 		},
 		NameConverter: SnakeCaseNameConverter,
 	}
