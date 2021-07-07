@@ -21,7 +21,6 @@ func DefaultOptions() *Options {
 			reflect.TypeOf(float64(0)): float64Handler,
 			reflect.TypeOf(true):       boolHandler,
 			reflect.TypeOf(""):         stringHandler,
-			reflect.TypeOf([]string{}): stringArrayHandler,
 		},
 		NameConverter: SnakeCaseNameConverter,
 	}

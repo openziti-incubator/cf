@@ -31,15 +31,11 @@ func boolHandler(v interface{}, f reflect.Value) error {
 
 func stringHandler(v interface{}, f reflect.Value) error {
 	if vt, ok := v.(string); ok {
-		f.SetString(vt)
-		return nil
-	}
-	return errors.Errorf("got [%s], expected [%s]", reflect.TypeOf(v), f.Type())
-}
-
-func stringArrayHandler(v interface{}, f reflect.Value) error {
-	if vt, ok := v.([]string); ok {
-		f.Set(reflect.ValueOf(vt))
+		if f.Kind() == reflect.Ptr {
+			f.Elem().SetString(vt)
+		} else {
+			f.SetString(vt)
+		}
 		return nil
 	}
 	return errors.Errorf("got [%s], expected [%s]", reflect.TypeOf(v), f.Type())

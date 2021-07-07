@@ -179,6 +179,10 @@ func TestStructTypeArray(t *testing.T) {
 		},
 	}
 
-	_ = Bind(root, data, DefaultOptions())
-	//assert.Nil(t, err)
+	err := Bind(root, data, DefaultOptions())
+	assert.Nil(t, err)
+	assert.Equal(t, "StructTypeArray", root.Id)
+	assert.Equal(t, 2, len(root.Nesteds))
+	assert.Equal(t, "a", root.Nesteds[0].Name)
+	assert.Equal(t, "b", root.Nesteds[1].Name)
 }
