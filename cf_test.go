@@ -187,8 +187,8 @@ func TestStructTypeArray(t *testing.T) {
 	var data = map[string]interface{}{
 		"id": "StructTypeArray",
 		"nesteds": []map[string]interface{}{
-			{ "name": "a" },
-			{ "name": "b" },
+			{"name": "a"},
+			{"name": "b"},
 		},
 	}
 

@@ -5,8 +5,7 @@ import (
 	"reflect"
 )
 
-func Dump(label string, cf interface{}) string {
-	opt := DefaultOptions()
+func Dump(indent int, cf interface{}, opt *Options) string {
 	cfV := reflect.ValueOf(cf)
 	if cfV.Kind() == reflect.Ptr {
 		cfV = cfV.Elem()
@@ -14,16 +13,37 @@ func Dump(label string, cf interface{}) string {
 	if cfV.Kind() != reflect.Struct {
 		return ""
 	}
-	out := label + " {\n"
-	format := fmt.Sprintf("\t%%-%ds %%v\n", maxKeyLength(cfV, opt))
+	out := "{\n"
+	format := fmt.Sprintf("%s%%-%ds %%v\n", nLevels(indent), maxKeyLength(cfV, opt))
 	for i := 0; i < cfV.NumField(); i++ {
 		if cfV.Field(i).CanInterface() {
 			fd := parseFieldData(cfV.Type().Field(i), opt)
-			out += fmt.Sprintf(format, fd.name, cfV.Field(i).Interface())
+			fieldType := cfV.Type().Field(i).Type
+			if fieldType.Kind() == reflect.Slice {
+				for j := 0; j < cfV.Field(i).Len(); j++ {
+					if j > 0 {
+						out += nLevels(indent)
+					}
+					out += "{"
+
+				}
+
+			} else if fieldType.Kind() == reflect.Struct || (fieldType.Kind() == reflect.Ptr && fieldType.Elem().Kind() == reflect.Struct) {
+				out += fmt.Sprintf(format, fd.name, "struct")
+			} else {
+				out += fmt.Sprintf(format, fd.name, cfV.Field(i).Interface())
+			}
 		}
 	}
 	out += "}\n"
 	return out
+}
+
+func nLevels(n int) string {
+	out := ""
+	for i := 0; i < n; i++ {
+		out += "\t"
+	}
 }
 
 func maxKeyLength(cfV reflect.Value, opt *Options) int {
