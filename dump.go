@@ -5,6 +5,46 @@ import (
 	"reflect"
 )
 
+func Tree(cf interface{}) string {
+	return treeNode(reflect.ValueOf(cf), -1)
+}
+
+func treeNode(v reflect.Value, indent int) string {
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	switch v.Kind() {
+	case reflect.Struct:
+		return treeNodeStruct(v, indent + 1)
+	case reflect.Slice:
+		return treeNodeSlice(v, indent + 1)
+	default:
+		return fmt.Sprintf("%v", v.Interface())
+	}
+}
+
+func treeNodeStruct(v reflect.Value, indent int) string {
+	out := "{\n"
+	for i := 0; i < v.NumField(); i++ {
+		if v.Field(i).CanInterface() {
+			fd := parseFieldData(v.Type().Field(i), DefaultOptions())
+			out += nLevels(indent + 1) + fd.name + ": " + treeNode(v.Field(i), indent) + "\n"
+		}
+	}
+	out += nLevels(indent) + "}"
+	return out
+}
+
+func treeNodeSlice(v reflect.Value, indent int) string {
+	out := "[\n"
+	for i := 0; i < v.Len(); i++ {
+		out += nLevels(indent + 1) + treeNode(v.Index(i), indent) + "\n"
+	}
+	out += nLevels(indent) + "]"
+	return out
+
+}
+
 func Dump(indent int, cf interface{}, opt *Options) string {
 	cfV := reflect.ValueOf(cf)
 	if cfV.Kind() == reflect.Ptr {
@@ -44,6 +84,7 @@ func nLevels(n int) string {
 	for i := 0; i < n; i++ {
 		out += "\t"
 	}
+	return out
 }
 
 func maxKeyLength(cfV reflect.Value, opt *Options) int {
