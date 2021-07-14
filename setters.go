@@ -17,6 +17,41 @@ func intSetter(v interface{}, f reflect.Value) error {
 	return errors.Errorf("got [%s], expected [%s]", reflect.TypeOf(v), f.Type())
 }
 
+func int8Setter(v interface{}, f reflect.Value) error {
+	if vt, ok := v.(int8); ok {
+		if f.Kind() == reflect.Ptr {
+			f.Elem().SetInt(int64(vt))
+		} else {
+			f.SetInt(int64(vt))
+		}
+		return nil
+	}
+	return errors.Errorf("got [%s], expected [%s]", reflect.TypeOf(v), f.Type())
+}
+
+func int16Setter(v interface{}, f reflect.Value) error {
+	if vt, ok := v.(int16); ok {
+		if f.Kind() == reflect.Ptr {
+			f.Elem().SetInt(int64(vt))
+		} else {
+			f.SetInt(int64(vt))
+		}
+		return nil
+	}
+	return errors.Errorf("got [%s], expected [%s]", reflect.TypeOf(v), f.Type())
+}
+
+func int32Setter(v interface{}, f reflect.Value) error {
+	if vt, ok := v.(int32); ok {
+		if f.Kind() == reflect.Ptr {
+			f.Elem().SetInt(int64(vt))
+		} else {
+			f.SetInt(int64(vt))
+		}
+	}
+	return errors.Errorf("got [%s], expected [%s]", reflect.TypeOf(v), f.Type())
+}
+
 func float64Setter(v interface{}, f reflect.Value) error {
 	if vt, ok := v.(float64); ok {
 		if f.Kind() == reflect.Ptr {
