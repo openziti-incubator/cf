@@ -88,6 +88,30 @@ func uint32Setter(v interface{}, f reflect.Value) error {
 	return errors.Errorf("got [%s], expected [%s]", reflect.TypeOf(v), f.Type())
 }
 
+func int64Setter(v interface{}, f reflect.Value) error {
+	if vt, ok := v.(int64); ok {
+		if f.Kind() == reflect.Ptr {
+			f.Elem().SetInt(int64(vt))
+		} else {
+			f.SetInt(int64(vt))
+		}
+		return nil
+	}
+	return errors.Errorf("got [%s], expected [%s]", reflect.TypeOf(v), f.Type())
+}
+
+func uint64Setter(v interface{}, f reflect.Value) error {
+	if vt, ok := v.(uint64); ok {
+		if f.Kind() == reflect.Ptr {
+			f.Elem().SetUint(vt)
+		} else {
+			f.SetUint(vt)
+		}
+		return nil
+	}
+	return errors.Errorf("got [%s], expected [%s]", reflect.TypeOf(v), f.Type())
+}
+
 func float64Setter(v interface{}, f reflect.Value) error {
 	if vt, ok := v.(float64); ok {
 		if f.Kind() == reflect.Ptr {

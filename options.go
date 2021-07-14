@@ -18,6 +18,14 @@ func DefaultOptions() *Options {
 	opt := &Options{
 		Setters: map[reflect.Type]Setter{
 			reflect.TypeOf(0):          intSetter,
+			reflect.TypeOf(int8(0)):    int8Setter,
+			reflect.TypeOf(uint8(0)):   uint8Setter,
+			reflect.TypeOf(int16(0)):   int16Setter,
+			reflect.TypeOf(uint16(0)):  uint16Setter,
+			reflect.TypeOf(int32(0)):   int32Setter,
+			reflect.TypeOf(uint32(0)):  uint32Setter,
+			reflect.TypeOf(int64(0)):   int64Setter,
+			reflect.TypeOf(uint64(0)):  uint64Setter,
 			reflect.TypeOf(float64(0)): float64Setter,
 			reflect.TypeOf(true):       boolSetter,
 			reflect.TypeOf(""):         stringSetter,
