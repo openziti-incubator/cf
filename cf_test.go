@@ -199,3 +199,24 @@ func TestStructTypeArray(t *testing.T) {
 	assert.Equal(t, "a", root.Nesteds[0].Name)
 	assert.Equal(t, "b", root.Nesteds[1].Name)
 }
+
+func TestAnonymousStruct(t *testing.T) {
+	root := &struct {
+		Id     string
+		Nested struct {
+			Name string
+		}
+	}{}
+
+	var data = map[string]interface{}{
+		"id": "AnonymousStruct",
+		"nested": map[string]interface{}{
+			"name": "oh, wow!",
+		},
+	}
+
+	err := Bind(root, data, DefaultOptions())
+	assert.Nil(t, err)
+	assert.Equal(t, "AnonymousStruct", root.Id)
+	assert.Equal(t, "oh, wow!", root.Nested.Name)
+}
