@@ -26,6 +26,14 @@ func int8Setter(v interface{}, f reflect.Value) error {
 		}
 		return nil
 	}
+	if vt, ok := v.(int); ok {
+		if f.Kind() == reflect.Ptr {
+			f.Elem().SetInt(int64(vt))
+		} else {
+			f.SetInt(int64(vt))
+		}
+		return nil
+	}
 	return errors.Errorf("got [%s], expected [%s]", reflect.TypeOf(v), f.Type())
 }
 
@@ -38,11 +46,27 @@ func uint8Setter(v interface{}, f reflect.Value) error {
 		}
 		return nil
 	}
+	if vt, ok := v.(int); ok {
+		if f.Kind() == reflect.Ptr {
+			f.Elem().SetUint(uint64(vt))
+		} else {
+			f.SetUint(uint64(vt))
+		}
+		return nil
+	}
 	return errors.Errorf("got [%s], expected [%s]", reflect.TypeOf(v), f.Type())
 }
 
 func int16Setter(v interface{}, f reflect.Value) error {
 	if vt, ok := v.(int16); ok {
+		if f.Kind() == reflect.Ptr {
+			f.Elem().SetInt(int64(vt))
+		} else {
+			f.SetInt(int64(vt))
+		}
+		return nil
+	}
+	if vt, ok := v.(int); ok {
 		if f.Kind() == reflect.Ptr {
 			f.Elem().SetInt(int64(vt))
 		} else {
@@ -72,6 +96,15 @@ func int32Setter(v interface{}, f reflect.Value) error {
 		} else {
 			f.SetInt(int64(vt))
 		}
+		return nil
+	}
+	if vt, ok := v.(int); ok {
+		if f.Kind() == reflect.Ptr {
+			f.Elem().SetInt(int64(vt))
+		} else {
+			f.SetInt(int64(vt))
+		}
+		return nil
 	}
 	return errors.Errorf("got [%s], expected [%s]", reflect.TypeOf(v), f.Type())
 }
@@ -85,11 +118,27 @@ func uint32Setter(v interface{}, f reflect.Value) error {
 		}
 		return nil
 	}
+	if vt, ok := v.(int); ok {
+		if f.Kind() == reflect.Ptr {
+			f.Elem().SetUint(uint64(vt))
+		} else {
+			f.SetUint(uint64(vt))
+		}
+		return nil
+	}
 	return errors.Errorf("got [%s], expected [%s]", reflect.TypeOf(v), f.Type())
 }
 
 func int64Setter(v interface{}, f reflect.Value) error {
 	if vt, ok := v.(int64); ok {
+		if f.Kind() == reflect.Ptr {
+			f.Elem().SetInt(vt)
+		} else {
+			f.SetInt(vt)
+		}
+		return nil
+	}
+	if vt, ok := v.(int); ok {
 		if f.Kind() == reflect.Ptr {
 			f.Elem().SetInt(int64(vt))
 		} else {
@@ -106,6 +155,14 @@ func uint64Setter(v interface{}, f reflect.Value) error {
 			f.Elem().SetUint(vt)
 		} else {
 			f.SetUint(vt)
+		}
+		return nil
+	}
+	if vt, ok := v.(int); ok {
+		if f.Kind() == reflect.Ptr {
+			f.Elem().SetUint(uint64(vt))
+		} else {
+			f.SetUint(uint64(vt))
 		}
 		return nil
 	}

@@ -220,3 +220,20 @@ func TestAnonymousStruct(t *testing.T) {
 	assert.Equal(t, "AnonymousStruct", root.Id)
 	assert.Equal(t, "oh, wow!", root.Nested.Name)
 }
+
+func TestUint32(t *testing.T) {
+	root := &struct {
+		Id    string
+		Count uint32
+	}{}
+
+	var data = map[string]interface{}{
+		"id":    "uint32",
+		"count": 33,
+	}
+
+	err := Bind(root, data, DefaultOptions())
+	assert.Nil(t, err)
+	assert.Equal(t, "uint32", root.Id)
+	assert.Equal(t, uint32(33), root.Count)
+}
