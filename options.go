@@ -1,6 +1,9 @@
 package cf
 
-import "reflect"
+import (
+	"reflect"
+	"time"
+)
 
 type Instantiator func() interface{}
 type Setter func(v interface{}, f reflect.Value) error
@@ -15,6 +18,7 @@ type Options struct {
 }
 
 func DefaultOptions() *Options {
+	var td time.Duration
 	opt := &Options{
 		Setters: map[reflect.Type]Setter{
 			reflect.TypeOf(0):          intSetter,
@@ -29,6 +33,7 @@ func DefaultOptions() *Options {
 			reflect.TypeOf(float64(0)): float64Setter,
 			reflect.TypeOf(true):       boolSetter,
 			reflect.TypeOf(""):         stringSetter,
+			reflect.TypeOf(td):         timeDurationSetter,
 		},
 		NameConverter: SnakeCaseNameConverter,
 	}

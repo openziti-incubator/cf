@@ -3,6 +3,7 @@ package cf
 import (
 	"github.com/pkg/errors"
 	"reflect"
+	"time"
 )
 
 func intSetter(v interface{}, f reflect.Value) error {
@@ -199,6 +200,22 @@ func stringSetter(v interface{}, f reflect.Value) error {
 			f.Elem().SetString(vt)
 		} else {
 			f.SetString(vt)
+		}
+		return nil
+	}
+	return errors.Errorf("got [%s], expected [%s]", reflect.TypeOf(v), f.Type())
+}
+
+func timeDurationSetter(v interface{}, f reflect.Value) error {
+	if vt, ok := v.(string); ok {
+		duration, err := time.ParseDuration(vt)
+		if err != nil {
+			return err
+		}
+		if f.Kind() == reflect.Ptr {
+			f.Elem().SetInt(int64(duration))
+		} else {
+			f.SetInt(int64(duration))
 		}
 		return nil
 	}

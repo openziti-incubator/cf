@@ -15,8 +15,8 @@ type dumpCfNested struct {
 }
 
 type dumpCfNestedArray struct {
-	Name    string
-	Tinies  []*dumpCfTiny
+	Name   string
+	Tinies []*dumpCfTiny
 }
 
 func TestDumpStruct(t *testing.T) {

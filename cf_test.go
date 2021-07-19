@@ -4,6 +4,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func TestBasic(t *testing.T) {
@@ -236,4 +237,18 @@ func TestUint32(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "uint32", root.Id)
 	assert.Equal(t, uint32(33), root.Count)
+}
+
+func TestTimeDuration(t *testing.T) {
+	root := &struct {
+		Duration time.Duration
+	}{}
+
+	var data = map[string]interface{}{
+		"duration": "30s",
+	}
+
+	err := Bind(root, data, DefaultOptions())
+	assert.Nil(t, err)
+	assert.Equal(t, time.Duration(30)*time.Second, root.Duration)
 }
