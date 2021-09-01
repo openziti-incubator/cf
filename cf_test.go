@@ -252,3 +252,21 @@ func TestTimeDuration(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, time.Duration(30)*time.Second, root.Duration)
 }
+
+func TestNestedEmptyInterface(t *testing.T) {
+	root := &struct {
+		Id       string
+		Flexible interface{}
+	}{}
+
+	var data = map[string]interface{}{
+		"id": "nested",
+		"flexible": map[string]interface{}{
+			"type":  "a",
+			"value": "a value",
+		},
+	}
+
+	err := Bind(root, data, DefaultOptions())
+	assert.Nil(t, err)
+}
