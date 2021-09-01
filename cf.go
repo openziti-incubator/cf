@@ -1,7 +1,6 @@
 package cf
 
 import (
-	"fmt"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
@@ -93,8 +92,9 @@ func Bind(cf interface{}, data map[string]interface{}, opt *Options) error {
 								return errors.Errorf("invalid arr map for field '%s' (%v)", fd.name, reflect.TypeOf(v))
 							}
 
+						} else if nestedType.Kind() == reflect.Interface {
+							return errors.Errorf("no setter for interface{} field '%s'", fd.name)
 						} else {
-							fmt.Println(opt.Setters)
 							return errors.Errorf("no setter for field '%s' of type '%s/%v'", fd.name, nestedType, nestedType.Kind())
 						}
 					} else {
