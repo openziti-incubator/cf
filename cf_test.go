@@ -253,6 +253,10 @@ func TestTimeDuration(t *testing.T) {
 	assert.Equal(t, time.Duration(30)*time.Second, root.Duration)
 }
 
+type flexibleType struct {
+	value string
+}
+
 func TestNestedEmptyInterface(t *testing.T) {
 	root := &struct {
 		Id       string
@@ -267,6 +271,12 @@ func TestNestedEmptyInterface(t *testing.T) {
 		},
 	}
 
-	err := Bind(root, data, DefaultOptions())
+	opt := DefaultOptions()
+	opt = opt.AddFlexibleSetter("a", func(v interface{}) (interface{}, error) { return &flexibleType{"a value"}, nil })
+
+	err := Bind(root, data, opt)
 	assert.Nil(t, err)
+	assert.NotNil(t, root.Flexible)
+	assert.Equal(t, reflect.TypeOf(root.Flexible), reflect.TypeOf(&flexibleType{}))
+	assert.Equal(t, "a value", root.Flexible.(*flexibleType).value)
 }
