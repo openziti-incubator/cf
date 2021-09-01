@@ -7,15 +7,16 @@ import (
 
 type Instantiator func() interface{}
 type Setter func(v interface{}, f reflect.Value) error
+type FlexibleSetter func(v interface{}) (interface{}, error)
 type Wiring func(cf interface{}) error
 type NameConverter func(f reflect.StructField) string
 
 type Options struct {
-	Instantiators map[reflect.Type]Instantiator
-	Setters       map[reflect.Type]Setter
-	Flexible      map[string]Setter
-	Wirings       map[reflect.Type][]Wiring
-	NameConverter NameConverter
+	Instantiators   map[reflect.Type]Instantiator
+	Setters         map[reflect.Type]Setter
+	FlexibleSetters map[string]FlexibleSetter
+	Wirings         map[reflect.Type][]Wiring
+	NameConverter   NameConverter
 }
 
 func DefaultOptions() *Options {
@@ -57,11 +58,11 @@ func (opt *Options) AddSetter(t reflect.Type, s Setter) *Options {
 	return opt
 }
 
-func (opt *Options) AddFlexible(typeName string, s Setter) *Options {
-	if opt.Flexible == nil {
-		opt.Flexible = make(map[string]Setter)
+func (opt *Options) AddFlexibleSetter(typeName string, fs FlexibleSetter) *Options {
+	if opt.FlexibleSetters == nil {
+		opt.FlexibleSetters = make(map[string]FlexibleSetter)
 	}
-	opt.Flexible[typeName] = s
+	opt.FlexibleSetters[typeName] = fs
 	return opt
 }
 

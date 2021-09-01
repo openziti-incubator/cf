@@ -93,7 +93,32 @@ func Bind(cf interface{}, data map[string]interface{}, opt *Options) error {
 							}
 
 						} else if nestedType.Kind() == reflect.Interface {
-							return errors.Errorf("no setter for interface{} field '%s'", fd.name)
+							if subData, ok := v.(map[string]interface{}); ok {
+								if t, ok := subData["type"]; ok {
+									if t, ok := t.(string); ok {
+										if opt.FlexibleSetters != nil {
+											if fs, found := opt.FlexibleSetters[t]; found {
+												value, err := fs(v)
+												if err != nil {
+													return errors.Wrapf(err, "flexible setter error for field '%s'", fd.name)
+												}
+												cfV.Field(i).Set(reflect.ValueOf(value))
+											} else {
+												return errors.Errorf("no flexible setter for field '%s'", fd.name)
+											}
+										} else {
+											return errors.Errorf("no flexible setters found for field '%s'", fd.name)
+										}
+									} else {
+										return errors.Errorf("'type' data not string value for field '%s'", fd.name)
+									}
+								} else {
+									return errors.Errorf("no 'type' data found for field '%s'", fd.name)
+								}
+							} else {
+								return errors.Errorf("interface{} field '%s' requires sub data map", fd.name)
+							}
+
 						} else {
 							return errors.Errorf("no setter for field '%s' of type '%s/%v'", fd.name, nestedType, nestedType.Kind())
 						}
