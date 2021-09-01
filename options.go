@@ -13,6 +13,7 @@ type NameConverter func(f reflect.StructField) string
 type Options struct {
 	Instantiators map[reflect.Type]Instantiator
 	Setters       map[reflect.Type]Setter
+	Flexible      map[string]Setter
 	Wirings       map[reflect.Type][]Wiring
 	NameConverter NameConverter
 }
@@ -53,6 +54,14 @@ func (opt *Options) AddSetter(t reflect.Type, s Setter) *Options {
 		opt.Setters = make(map[reflect.Type]Setter)
 	}
 	opt.Setters[t] = s
+	return opt
+}
+
+func (opt *Options) AddFlexible(typeName string, s Setter) *Options {
+	if opt.Flexible == nil {
+		opt.Flexible = make(map[string]Setter)
+	}
+	opt.Flexible[typeName] = s
 	return opt
 }
 
