@@ -272,7 +272,7 @@ func TestNestedEmptyInterface(t *testing.T) {
 	}
 
 	opt := DefaultOptions()
-	opt = opt.AddFlexibleSetter("a", func(v interface{}) (interface{}, error) { return &flexibleType{"a value"}, nil })
+	opt = opt.AddFlexibleSetter("a", func(v interface{}, opt *Options) (interface{}, error) { return &flexibleType{"a value"}, nil })
 
 	err := Bind(root, data, opt)
 	assert.Nil(t, err)
